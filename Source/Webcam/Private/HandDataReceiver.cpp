@@ -4,6 +4,7 @@
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "Sockets.h"
 #include "TimerManager.h"
+#include "Math/UnitConversion.h"
 
 
 void UHandDataReceiver::StartPythonScript()
@@ -16,10 +17,10 @@ void UHandDataReceiver::StartPythonScript()
 	// // Créer le processus
 	// FProcHandle ProcHandle = FPlatformProcess::CreateProc(*PythonExe, *ScriptPath, true, false, false, nullptr, 0,
 	//                                                       nullptr, nullptr);
-	
+
 	// FString Command = TEXT("C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe");
 	// FString Params = TEXT("& C:/Users/Rom1/AppData/Local/Programs/Python/Python312/python.exe 'c:/Users/Rom1/Documents/Unreal Projects/VisualExperiments/Content/Python/HandRecognition.py'");
-	
+
 	// FString Command = TEXT("C:/Users/Rom1/AppData/Local/Programs/Python/Python312/python.exe");
 	// FString Params = TEXT("C:/Users/Rom1/Documents/Unreal Projects/VisualExperiments/Content/Python/HandRecognition.py");
 	//
@@ -53,36 +54,49 @@ void UHandDataReceiver::StartReceiver()
 	ReceiverSocket = SocketSubsystem->CreateSocket(NAME_Stream, TEXT("HandDataReceiver"), false);
 
 	// Lancer le timer pour recevoir les données
-	FTimerHandle TimerHandleReceiver;
-	if(GetOuter()->GetWorld())
+	if (GetOuter()->GetWorld())
 	{
-		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerHandleReceiver, this, &UHandDataReceiver::ReceiveData, 1.f, true);
+		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerHandleReceiver, this, &UHandDataReceiver::TryToConnectToServer,
+		                                                   1.f, true);
+	}
+}
+
+void UHandDataReceiver::TryToConnectToServer()
+{
+	// Création du socket
+	if (ReceiverSocket->Connect(*Addr))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Connexion établie !"));
+		if (GetOuter()->GetWorld())
+		{
+			GetOuter()->GetWorld()->GetTimerManager().ClearTimer(TimerHandleReceiver);
+		}
+		Connected = true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to connect :("));
 	}
 }
 
 void UHandDataReceiver::ReceiveData()
 {
-	if (!Connected)
+	if(!Connected)
 	{
-		// Création du socket
-		Connected = ReceiverSocket->Connect(*Addr);
-		if(Connected)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Connexion établie !"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to connect :("));
-			return;
-		}
+		return;
 	}
-
-	ReceivedDataAsString.Empty();
 	
+	ReceivedDataAsString.Empty();
+
 	TArray<uint8> ReceivedData;
 	uint32 Size;
 	while (ReceiverSocket->HasPendingData(Size))
 	{
+		double CurrentReceivedTimer = GetWorld()->GetTimeSeconds();
+		double Delta = CurrentReceivedTimer - LastReceivedTimer;
+		LastReceivedTimer = CurrentReceivedTimer;
+		UE_LOG(LogTemp, Warning, TEXT("Delta %f"), Delta);
+
 		ReceivedData.SetNumUninitialized(Size);
 		int32 Read = 0;
 		ReceiverSocket->Recv(ReceivedData.GetData(), ReceivedData.Num(), Read);

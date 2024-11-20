@@ -23,12 +23,12 @@ class WEBCAM_API AMyActor : public AActor
 public: 
 	// Sets default values for this actor's properties
 	AMyActor();
-	void TestOpenCV();
+	// void TestOpenCV();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+	// virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 
 	cv::VideoCapture* Capture;
@@ -54,8 +54,8 @@ protected:
 public: 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void CaptureFrame();
-	void UpdateTexture(const cv::Mat& Frame);
+	// void CaptureFrame();
+	// void UpdateTexture(const cv::Mat& Frame);
 
 	UPROPERTY(EditAnywhere)
 	int BlurLevel = 35;

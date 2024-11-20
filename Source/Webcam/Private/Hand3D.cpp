@@ -19,7 +19,7 @@ AHand3D::AHand3D()
 void AHand3D::BeginPlay()
 {
 	Super::BeginPlay();
-	for(int i=0; i<22; i++)
+	for(int i=0; i<21; i++)
 	{
 		FString Name = EnumToString("EHandLandmark", EHandLandmark(i));
 		FHand3DPoint Point = FHand3DPoint(Name, FVector3f(0), GetWorld()->SpawnActor<AActor>(PointClass));
@@ -33,11 +33,11 @@ void AHand3D::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AHand3D::Update(FString DataParsed)
+void AHand3D::Update(TArray<FVector> Landmarks)
 {
-	HandDataAsset->Update(DataParsed);
+	// HandDataAsset->Update(DataParsed);
 	int index = 0;
-	for(FVector3f Coordinate : HandDataAsset->GetLandmarksCoordinates())
+	for(FVector Coordinate : Landmarks)
 	{
 		FVector Coordinates = FVector(Coordinate.Z, Coordinate.X, -Coordinate.Y);
 		HandPoints[index].Point->SetActorLocation(FVector(Coordinates*1000.f));

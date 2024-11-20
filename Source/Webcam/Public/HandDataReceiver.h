@@ -13,13 +13,15 @@ public:
 	void StartPythonScript();
 	UFUNCTION()
 	void StartReceiver();
+	void TryToConnectToServer();
 	void ReceiveData();
 	
 	FString ReceivedDataAsString;
 
 private:
 	FSocket* ReceiverSocket;
-	FTimerHandle* TimerHandle;
+	FTimerHandle TimerHandleReceiver;
+	double LastReceivedTimer = 0;
 
 	TSharedPtr<FInternetAddr> Addr;
 	const FString& IP = "127.0.0.1";

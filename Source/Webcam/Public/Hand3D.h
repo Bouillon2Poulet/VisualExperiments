@@ -38,7 +38,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void Update(FString DataParsed);
+	void Update(TArray<FVector> Landmarks);
 	
 	UPROPERTY()
 	UHandDatas* HandDataAsset;
