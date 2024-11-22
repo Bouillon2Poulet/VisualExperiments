@@ -15,6 +15,9 @@
 #include "MyActor.generated.h"
 
 class UHandDatas;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRefreshUI, const TArray<FVector>&, Landmarks, FString, HandType);
+
 UCLASS()
 class WEBCAM_API AMyActor : public AActor
 {
@@ -43,10 +46,10 @@ protected:
 	UPROPERTY()
 	UHandDataReceiver* HandDataReceiver;
 
-	UPROPERTY()
-	AHand3D* RightHand;
-	UPROPERTY()
-	AHand3D* LeftHand;
+	// UPROPERTY()
+	// AHand3D* RightHand;
+	// UPROPERTY()
+	// AHand3D* LeftHand;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AHand3D> Hand3DClass;
@@ -56,6 +59,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	// void CaptureFrame();
 	// void UpdateTexture(const cv::Mat& Frame);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnRefreshUI OnRefreshUI;
 
 	UPROPERTY(EditAnywhere)
 	int BlurLevel = 35;

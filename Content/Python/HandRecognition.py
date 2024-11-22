@@ -43,13 +43,13 @@ while cap.isOpened():
             ]
             hands_data["hands"].append({"type": hand_type, "landmarks": landmarks})
 
-    # Envoi des données JSON
-    try:
-        json_data = json.dumps(hands_data)
-        client_socket.send(json_data.encode())
-    except Exception as e:
-        print("Error sending data:", e)
-        break
+        # Envoi des données JSON
+        try:
+            json_data = json.dumps(hands_data)
+            client_socket.sendall(json_data.encode('utf-8'))
+        except Exception as e:
+            print("Error sending data:", e)
+            break
 
     # Affichage des résultats
     for hand_landmarks in results.multi_hand_landmarks or []:

@@ -25,8 +25,8 @@ void AMyActor::BeginPlay()
 
     if (GetWorld())
     {
-        RightHand = GetWorld()->SpawnActor<AHand3D>(Hand3DClass);
-        LeftHand = GetWorld()->SpawnActor<AHand3D>(Hand3DClass);
+        // RightHand = GetWorld()->SpawnActor<AHand3D>(Hand3DClass);
+        // LeftHand = GetWorld()->SpawnActor<AHand3D>(Hand3DClass);
     }
 
     HandDataReceiver = NewObject<UHandDataReceiver>(this);
@@ -79,17 +79,20 @@ void AMyActor::Tick(float DeltaTime)
 
                         if (HandType == "Right")
                         {
-                            RightHand->Update(Landmarks);
+                            // RightHand->Update(Landmarks);
+                            OnRefreshUI.Broadcast(Landmarks, "Right");
                         }
                         else if (HandType == "Left")
                         {
-                            LeftHand->Update(Landmarks);
+                            // LeftHand->Update(Landmarks);
+                            OnRefreshUI.Broadcast(Landmarks, "Left");
                         }
                     }
                 }
             }
         }
     }
+    
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON data: %s"), *ReceivedData);
