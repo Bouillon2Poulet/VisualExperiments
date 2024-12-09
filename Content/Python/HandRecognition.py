@@ -14,7 +14,7 @@ cap = cv2.VideoCapture(0)
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(("localhost", 9999))
-    server_socket.listen(1)
+    server_socket.listen(9999)
     print("Server is listening on port 9999...")
     client_socket, addr = server_socket.accept()
     print("Connection from:", addr)
@@ -42,14 +42,17 @@ while cap.isOpened():
                 for lm in hand_landmarks.landmark
             ]
             hands_data["hands"].append({"type": hand_type, "landmarks": landmarks})
-
-        # Envoi des données JSON
-        try:
-            json_data = json.dumps(hands_data)
-            client_socket.sendall(json_data.encode('utf-8'))
-        except Exception as e:
-            print("Error sending data:", e)
+    # Envoi des données JSON avec accusé de réception
+    try:
+        json_data = json.dumps(hands_data)
+        client_socket.sendall(json_data.encode('utf-8'))
+        ack = client_socket.recv(1024).decode('utf-8')  # Attend l'accusé de réception
+        if ack != "ACK":
+            print("No acknowledgment received, stopping.")
             break
+    except Exception as e:
+        print("Error sending data:", e)
+        break
 
     # Affichage des résultats
     for hand_landmarks in results.multi_hand_landmarks or []:

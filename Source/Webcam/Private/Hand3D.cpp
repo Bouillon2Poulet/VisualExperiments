@@ -37,11 +37,14 @@ void AHand3D::Update(TArray<FVector> Landmarks)
 {
 	// HandDataAsset->Update(DataParsed);
 	int index = 0;
+	FVector Sum = FVector(0);
 	for(FVector Coordinate : Landmarks)
 	{
 		FVector Coordinates = FVector(Coordinate.Z, Coordinate.X, -Coordinate.Y);
 		HandPoints[index].Point->SetActorLocation(FVector(Coordinates*1000.f));
+		Sum += Coordinate;
 		index++;
 	}
+	HandAverageLocation = Sum/index;
 }
 

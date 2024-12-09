@@ -32,6 +32,10 @@ protected:
 
 	UPROPERTY()
 	TArray<FHand3DPoint> HandPoints;
+
+	UPROPERTY()
+	FVector HandAverageLocation;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> PointClass;
 

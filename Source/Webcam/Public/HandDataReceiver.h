@@ -27,4 +27,6 @@ private:
 	const FString& IP = "127.0.0.1";
 	const int32 Port = 9999;
 	bool Connected = false;
+
+	FString AccumulatedData;
 };

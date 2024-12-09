@@ -11,12 +11,14 @@
 
 #include "Hand3D.h"
 #include "HandDataReceiver.h"
+#include "NoiseGenerator.h"
 #include "PostOpenCVHeaders.h"
 #include "MyActor.generated.h"
 
 class UHandDatas;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRefreshUI, const TArray<FVector>&, Landmarks, FString, HandType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDatasReceived, FVector, HandAverageLocation, FString, HandType);
 
 UCLASS()
 class WEBCAM_API AMyActor : public AActor
@@ -27,13 +29,19 @@ public:
 	// Sets default values for this actor's properties
 	AMyActor();
 	// void TestOpenCV();
+	
+	UFUNCTION(BlueprintCallable)
+	UNoiseGenerator* GetNoiseGenerator();
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	virtual void Initialize();
 	// virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
-
-
+	
+	UPROPERTY(Blueprintable, VisibleAnywhere)
+	UNoiseGenerator* NoiseGenerator;
+	
 	cv::VideoCapture* Capture;
 	UPROPERTY()
 	UTexture2D* DynamicTexture;
@@ -62,6 +70,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnRefreshUI OnRefreshUI;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnDatasReceived OnDatasReceived;
 
 	UPROPERTY(EditAnywhere)
 	int BlurLevel = 35;

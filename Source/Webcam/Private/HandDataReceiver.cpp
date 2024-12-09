@@ -104,6 +104,10 @@ void UHandDataReceiver::ReceiveData()
 		// Conversion des données reçues
 		ReceivedDataAsString = FString(ANSI_TO_TCHAR(reinterpret_cast<const char*>(ReceivedData.GetData())));
 
+		// Envoyer un accusé de réception
+		FString Acknowledgment = TEXT("ACK");
+		int bytes;
+		ReceiverSocket->Send((uint8*)TCHAR_TO_ANSI(*Acknowledgment), Acknowledgment.Len(), bytes);
 		// Traitement des données
 		// UE_LOG(LogTemp, Warning, TEXT("Coordonnées reçues : %s"), *ReceivedDataAsString);
 	}
