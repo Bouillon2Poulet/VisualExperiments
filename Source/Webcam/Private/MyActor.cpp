@@ -44,7 +44,7 @@ void AMyActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	HandDataReceiver->ReceiveData();
-	FString ReceivedData = HandDataReceiver->ReceivedDataAsString.;
+	FString ReceivedData = HandDataReceiver->ReadData();
 	if (ReceivedData.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No data received."));

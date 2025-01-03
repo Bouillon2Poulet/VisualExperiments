@@ -15,7 +15,8 @@ public:
 	void StartReceiver();
 	void TryToConnectToServer();
 	void ReceiveData();
-	
+	static FString ReadData();
+
 	FString ReceivedDataAsString;
 
 private:

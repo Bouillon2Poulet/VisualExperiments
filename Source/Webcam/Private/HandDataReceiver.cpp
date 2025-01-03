@@ -53,12 +53,12 @@ void UHandDataReceiver::StartReceiver()
 	Addr = AddrRef.ToSharedPtr();
 	ReceiverSocket = SocketSubsystem->CreateSocket(NAME_Stream, TEXT("HandDataReceiver"), false);
 
-	// Lancer le timer pour recevoir les données
-	if (GetOuter()->GetWorld())
-	{
-		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerHandleReceiver, this, &UHandDataReceiver::TryToConnectToServer,
-		                                                   1.f, true);
-	}
+	// // Lancer le timer pour recevoir les données
+	// if (GetOuter()->GetWorld())
+	// {
+	// 	GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerHandleReceiver, this, &UHandDataReceiver::TryToConnectToServer,
+	// 	                                                   1.f, true);
+	// }
 }
 
 void UHandDataReceiver::TryToConnectToServer()
@@ -111,4 +111,27 @@ void UHandDataReceiver::ReceiveData()
 		// Traitement des données
 		// UE_LOG(LogTemp, Warning, TEXT("Coordonnées reçues : %s"), *ReceivedDataAsString);
 	}
+}
+
+FString UHandDataReceiver::ReadData()
+{
+	// Chemin du fichier JSON
+	FString FilePath = FPaths::Combine(FPaths::ProjectDir(), TEXT("Content/Python/hand_data.json"));
+
+	FString JsonContent;
+
+	// Accès au fichier en lecture seule
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	if (PlatformFile.FileExists(*FilePath))
+	{
+		// Ouvre le fichier avec la méthode standard de lecture
+		FFileHelper::LoadFileToString(JsonContent, *FilePath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Le fichier %s n'existe pas !"), *FilePath);
+	}
+
+	return JsonContent;
 }

@@ -1,8 +1,9 @@
 import cv2
-import socket
 import mediapipe as mp
 import json
+import os
 import time
+import shutil
 
 # Initialisation des objets MediaPipe et OpenCV
 mp_hands = mp.solutions.hands
@@ -10,18 +11,11 @@ hands = mp_hands.Hands()
 mp_drawing = mp.solutions.drawing_utils
 cap = cv2.VideoCapture(0)
 
-# Initialisation du serveur
-def start_server():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("localhost", 9999))
-    server_socket.listen(9999)
-    print("Server is listening on port 9999...")
-    client_socket, addr = server_socket.accept()
-    print("Connection from:", addr)
-    return client_socket
-
-if __name__ == "__main__":
-    client_socket = start_server()
+# Chemins des fichiers JSON
+temp_file = "hand_data.tmp"
+final_file = "hand_data.json"
+json_temp_file_path = os.path.join(os.path.dirname(__file__), temp_file)
+json_file_path = os.path.join(os.path.dirname(__file__), final_file)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -42,16 +36,20 @@ while cap.isOpened():
                 for lm in hand_landmarks.landmark
             ]
             hands_data["hands"].append({"type": hand_type, "landmarks": landmarks})
-    # Envoi des données JSON avec accusé de réception
+
+    # Écriture des données JSON dans un fichier temporaire
     try:
-        json_data = json.dumps(hands_data)
-        client_socket.sendall(json_data.encode('utf-8'))
-        ack = client_socket.recv(1024).decode('utf-8')  # Attend l'accusé de réception
-        if ack != "ACK":
-            print("No acknowledgment received, stopping.")
-            break
+        with open(json_temp_file_path, "w") as json_file:
+            json.dump(hands_data, json_file)
+
+        # Supprimer le fichier final s'il existe
+        if os.path.exists(json_file_path):
+            os.remove(json_file_path)
+
+        # Renommage du fichier temporaire vers le fichier final
+        shutil.move(json_temp_file_path, json_file_path)
     except Exception as e:
-        print("Error sending data:", e)
+        print("Error handling JSON file:", e)
         break
 
     # Affichage des résultats
@@ -65,4 +63,3 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
-client_socket.close()
